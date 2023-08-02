@@ -1,6 +1,6 @@
 #include "main.h"
 
-int main(void)
+int main(int ac, char **argv)
 {
 	size_t buffsize = BUFF_SIZE;
 	char *buffer, *buffer_copy, **token_array;
