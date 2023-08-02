@@ -49,6 +49,8 @@ int main(int ac, char **argv)
 			argv[i] = strdup(token_array[i]);
 		argv[num_tokens] = NULL;
 
+		execute_input(argv);
+
 		free_tokens(token_array, num_tokens);
 		free(argv);
 
