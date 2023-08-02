@@ -6,6 +6,7 @@ int main(int ac, char **argv)
 	char *buffer, **token_array;
 	size_t characters;
 	int num_tokens, i;
+	(void)ac;
 
 	buffer = (char *)malloc(buffsize * sizeof(char));
 	if (buffer == NULL)
@@ -52,9 +53,9 @@ int main(int ac, char **argv)
 		execute_input(argv);
 
 		free_tokens(token_array, num_tokens);
-		free(argv);
 
 		
 	}
+	free(argv);
 	return (0);
 }
