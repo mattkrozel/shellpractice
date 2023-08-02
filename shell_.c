@@ -3,9 +3,9 @@
 int main(int ac, char **argv)
 {
 	size_t buffsize = BUFF_SIZE;
-	char *buffer, *buffer_copy, **token_array;
+	char *buffer, **token_array;
 	size_t characters;
-	int num_tokens;
+	int num_tokens, i;
 
 	buffer = (char *)malloc(buffsize * sizeof(char));
 	if (buffer == NULL)
@@ -33,21 +33,24 @@ int main(int ac, char **argv)
 			free(buffer);
 			exit(0);
 		}
-		buffer_copy = malloc(sizeof(char) * characters);
-		if (buffer_copy == NULL)
-		{
-			perror("tsh: memory allocation error");
-			return (-1);
-		}
-		strcpy(buffer_copy, buffer);
 		printf("%ld characters read \n", characters);
 		printf("your command is %s \n", buffer);
 		token_array = split_string(buffer, WHITESPACE, &num_tokens);
 		print_tokens(token_array, num_tokens);
-		num_tokens++;
-		argv = malloc(sizeof(char *) * num_tokens);
+
+		char **argv = malloc(sizeof(char *) * (num_tokens + 1));
+
+		if (!argv)
+		{
+			fprintf(stderr, "Memory allocation error.\n");
+			exit(1);
+		}
+		for (i = 0; i < num_tokens; i++)
+			argv[i] = strdup(token_array[i]);
+		argv[num_tokens] = NULL;
 
 		free_tokens(token_array, num_tokens);
+		free(argv);
 
 		
 	}
