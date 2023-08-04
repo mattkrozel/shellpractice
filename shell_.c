@@ -1,11 +1,13 @@
 #include "main.h"
 
-int main(int ac, char **argv)
+int main(int ac, char **argv, char **env)
 {
 	size_t buffsize = BUFF_SIZE;
 	char *buffer, **token_array;
 	size_t characters;
+	char *real_command;
 	int num_tokens, i;
+	
 	(void)ac;
 
 	buffer = (char *)malloc(buffsize * sizeof(char));
@@ -18,6 +20,7 @@ int main(int ac, char **argv)
 	while (1)
 	{
 		buffer = get_input(&buffsize);
+		signal(SIGINT, handle);
 		characters = strlen(buffer);
 		if (characters == -1)
 		{
@@ -34,12 +37,17 @@ int main(int ac, char **argv)
 			free(buffer);
 			exit(0);
 		}
-		printf("%ld characters read \n", characters);
-		printf("your command is %s \n", buffer);
+		if (strcmp(buffer, "env") == 0)
+			print_enviro(env);
+/**		
+ *		printf("%ld characters read \n", characters);
+ *		printf("your command is %s \n", buffer);
+ */
 		token_array = split_string(buffer, WHITESPACE, &num_tokens);
-		print_tokens(token_array, num_tokens);
-
-		char **argv = malloc(sizeof(char *) * (num_tokens + 1));
+/**		
+ *		print_tokens(token_array, num_tokens);
+ */
+		argv = (char **)malloc(sizeof(char *) * (num_tokens + 1));
 
 		if (!argv)
 		{
@@ -49,13 +57,32 @@ int main(int ac, char **argv)
 		for (i = 0; i < num_tokens; i++)
 			argv[i] = strdup(token_array[i]);
 		argv[num_tokens] = NULL;
+		real_command = find_command(argv[0]);
+		if (real_command != NULL)
+		{
+			execute_input(argv);
+		}
+		else
+		{
+			fprintf(stderr, "Command not found: %s\n", argv[0]);
+		}
 
-		execute_input(argv);
 
 		free_tokens(token_array, num_tokens);
-
+		free(argv);
+		fflush(stdin);
+		buffer = NULL, buffsize = 0;
 		
 	}
-	free(argv);
-	return (0);
+	free(buffer);
+	if (characters == -1)
+		return(EXIT_FAILURE);
+	return (EXIT_SUCCESS);
+}
+
+
+void handle(int signals)
+{
+	(void)signals;
+	write(STDOUT_FILENO, "\n$ ", 2);
 }

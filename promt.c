@@ -6,14 +6,21 @@ char *get_input(size_t *buffsize)
 	char *buffer = NULL;
 	if (isatty(STDIN_FILENO))
 	{	
-		printf("enter command: ");
+		write(STDOUT_FILENO, "$ ", 2);
 	}
 	characters = getline(&buffer, buffsize, stdin);
 
-	if (characters == -1)
+	if (characters == EOF)
 	{
-		fprintf(stderr, "error readinng input. \n");
-		exit(1);
+		if (buffer)
+		{
+			free(buffer);
+			buffer = NULL;
+		}
+		if (isatty(STDIN_FILENO))
+			write(STDOUT_FILENO, "\n", 1);
+		free(buffer);
+		exit(EXIT_SUCCESS);
 	}
 	if (characters > 0 && buffer[characters - 1] == '\n')
 	{
